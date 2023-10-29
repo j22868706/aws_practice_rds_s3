@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>留言板</title>
+</head>
+<body>
+    <header style=" margin: 0 auto;">
+        <div style="font-size: 36px; font-weight: 700; margin-top: 20px; text-align: center;">留言板</div>
+    </header>
+    <main style="width: 800px; margin: 0 auto; margin-top: 10px; border: 2px solid lightgrey">
+        <div style="font-size: 24px; font-weight: 500; margin-top: 20px; margin-left: 20px; margin-bottom: 20px;" >發表一篇圖文</div>
+        <div style="display: flex; align-items: center;">
+            <div>
+                  <form action="/upload" method="POST" enctype="multipart/form-data">
+                    <div>
+                      <label style="font-size: 18px; font-weight: 300; margin-left: 20px; margin-bottom: 10px; align-items: center;" for="usr">文字內容:</label>
+                      <input name="text" type="text" class="form-control" id="usr">
+                    </div>
+                    <div style="margin-top: 10px;">
+                        <label style="font-size: 18px; font-weight: 300; margin-left: 20px; margin-bottom: 10px;">圖片檔案</label>
+                        <input type="file" name="user_file">
+                    </div>
+                    <input style="cursor: pointer; border-radius: 5px;margin-left: 20px; height: 30px; margin-top: 10px;" type="submit" name="submit" value="Submit" class="btn btn-success">
+                </form>
+            </div>
+        </div>
+        <hr style="width:95%; border: 0; border-top: 1px solid darkgray; margin: 20px auto;">
+        <div id="details-container">
+        </div>
+    </main>
+    <script>
+        function callDetailsFunction() {
+            fetch('/get_details')
+                .then(response => response.json())
+                .then(data => {
+                    const detailsContainer = document.getElementById('details-container');
+                    if (data.length > 0) {
+                        const ul = document.createElement('ul');
+                        ul.style.padding = 0; // Add padding to remove default spacing
+                        ul.style.textAlign = 'center'; // Center the list items horizontally
+                        ul.style.listStyle = "none";
+
+                        data.forEach(detail => {
+                            const li = document.createElement('li');
+                            const text = document.createElement('div');
+                            text.textContent = detail.text; // Use the 'text' field
+                            const image = document.createElement('img');
+                            image.setAttribute('src', detail.image_url); // Use the 'image_url' field
+                            image.setAttribute('alt', 'Uploaded Image');
+                            const hr = document.createElement('hr');
+
+                            li.style.fontSize = '18px';
+                            li.style.textAlign = 'left';
+                            li.style.marginBottom = '5px';
+                            li.style.marginLeft = "25px"
+                            image.style.width = '100px';
+                            image.style.height = '100px';
+                            hr.style.width = '95%';
+                            hr.style.border = '0';
+                            hr.style.borderTop = '1px solid darkgray';
+                            hr.style.textAlign = 'left';
+    
+                            // Append the text and image to the list item
+                            li.appendChild(text);
+                            li.appendChild(image);
+
+    
+                            // Append the list item to the unordered list
+                            ul.appendChild(li);
+                            ul.appendChild(hr);
+
+
+                        });
+                        detailsContainer.appendChild(ul);
+                    }
+                })
+                .catch(error => {
+                    console.error(error);
+                });
+        }
+        window.onload = callDetailsFunction;
+    </script>
+</body>
+</html>

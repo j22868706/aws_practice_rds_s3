@@ -1,0 +1,7 @@
+flask==2.3.2
+pymysql==1.1.0
+boto3==1.24.28
+python-dotenv==1.0.0
+
+
+
