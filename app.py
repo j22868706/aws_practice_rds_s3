@@ -2,6 +2,7 @@ from flask import *
 import pymysql
 import rds_db as db
 import boto3
+import uuid
 from dotenv import load_dotenv
 import os
 load_dotenv()
@@ -23,32 +24,35 @@ def index():
 
 @app.route("/upload", methods=["POST"])
 def upload():
+    alert_message = None
+
     if 'user_file' not in request.files:
-        flash('No user_file key in request.files')
+        alert_message = 'No user_file key in request.files'
         return redirect(url_for('index'))
     
     file = request.files['user_file']
-    print(file)
     text = request.form['text']
-    print(text)
 
     if file.filename == '':
-        flash('No selected file')
+        alert_message = 'No selected file'
         return redirect(url_for('index'))
 
     if file and allowed_file(file.filename):
         try:
-            
-            s3.upload_fileobj(file, BUCKET_NAME, file.filename)
+            new_filename = str(uuid.uuid4())
+            file_extension = file.filename.rsplit('.', 1)[1]
+            new_filename_with_extension = f"{new_filename}.{file_extension}"
+            s3.upload_fileobj(file, BUCKET_NAME, new_filename_with_extension)
             flash("Success upload")
             image_url = s3.generate_presigned_url("get_object", Params={"Bucket": BUCKET_NAME, "Key": file.filename},)
             db.insert_details(text, image_url)
             return redirect(url_for('index'))
         except Exception as e:
-            flash("Unable to upload, try again")
+            alert_message = 'Unable to upload, try again'
     else:
-        flash("File type not accepted, please try again")
-
+        alert_message = 'File type not accepted, please try again'
+    
+    flash(alert_message)
     return redirect(url_for('index'))
 
 
