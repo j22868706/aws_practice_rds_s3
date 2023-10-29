@@ -44,7 +44,8 @@ def upload():
             new_filename_with_extension = f"{new_filename}.{file_extension}"
             s3.upload_fileobj(file, BUCKET_NAME, new_filename_with_extension)
             flash("Success upload")
-            image_url = s3.generate_presigned_url("get_object", Params={"Bucket": BUCKET_NAME, "Key": file.filename},)
+            base_url = f'https://s3.amazonaws.com/{BUCKET_NAME}/'
+            image_url = base_url + new_filename_with_extension
             db.insert_details(text, image_url)
             return redirect(url_for('index'))
         except Exception as e:
