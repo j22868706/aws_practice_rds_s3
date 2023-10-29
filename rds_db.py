@@ -26,7 +26,7 @@ def get_details():
 )
     try:
         cur = conn.cursor()
-        cur.execute("SELECT message, image_url FROM message")
+        cur.execute("SELECT message, image_url FROM message ORDER BY id DESC")
         details = cur.fetchall()
     except Exception as e:
         print("Error:", e)
