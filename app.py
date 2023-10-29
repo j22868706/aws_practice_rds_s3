@@ -12,6 +12,8 @@ app.secret_key = os.getenv("app.secret_key")
 app.config['SESSION_TYPE'] = 'filesystem'
 s3 = boto3.client("s3", aws_access_key_id=os.getenv("aws_access_key_id"), aws_secret_access_key=os.getenv("aws_secret_access_key"))
 BUCKET_NAME = os.getenv("BUCKET_NAME")
+CloudFrontDomainName = os.getenv("CFDDomainName")
+
 
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
 
@@ -44,7 +46,7 @@ def upload():
             new_filename_with_extension = f"{new_filename}.{file_extension}"
             s3.upload_fileobj(file, BUCKET_NAME, new_filename_with_extension)
             flash("Success upload")
-            base_url = f'https://s3.amazonaws.com/{BUCKET_NAME}/'
+            base_url = f'https://{CloudFrontDomainName}/'
             image_url = base_url + new_filename_with_extension
             db.insert_details(text, image_url)
             return redirect(url_for('index'))
